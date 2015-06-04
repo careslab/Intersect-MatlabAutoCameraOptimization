@@ -1,0 +1,185 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>PercentageSphereInView</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-03-19"><meta name="DC.source" content="PercentageSphereInView.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> [ percentage , inter] = PercentageSphereInView (nearRectangle, farRectangle, Sphere, tess  )
+<span class="comment">%depth of field will be 8 point giving the coordinates of the</span>
+<span class="comment">%depth of field vertices of the two rectangles (near and far rectangle).</span>
+<span class="comment">%This is the edge of the viewing fulcstrum, as given by the draw_pyramid</span>
+<span class="comment">%command.  Just send the matricies from drawing two pyramids.</span>
+<span class="comment">%rect = struct ('x',handles.px, 'y', handles.py, 'z', handles.pz)</span>
+<span class="comment">% Sphere are the coordinates of the sphere of influence as given by the</span>
+<span class="comment">% sphere command.</span>
+<span class="comment">%sphere = struct ('x',handles.px, 'y', handles.py, 'z', handles.pz)</span>
+<span class="comment">% tess is the tesselation used in the sphere command.  ie. 10 means that</span>
+<span class="comment">% you will have an 3 x 11 x 11 matrix.</span>
+<span class="comment">%UNTITLED Summary of this function goes here</span>
+<span class="comment">%   Detailed explanation goes here</span>
+
+<span class="comment">%extract the coordinates of the convex hull at the end of the pyramid.</span>
+xyz = zeros(16, 3);
+k = 1;
+<span class="keyword">for</span> i=2:3
+    <span class="keyword">for</span> j = 1:4
+      xyz(k, :) = [ nearRectangle.x(i,j) nearRectangle.y(i,j) nearRectangle.z(i,j)];
+      k = k+1;
+    <span class="keyword">end</span>
+    <span class="keyword">for</span> j = 1:4
+      xyz(k, :) = [ farRectangle.x(i,j) farRectangle.y(i,j) farRectangle.z(i,j)];
+      k = k + 1;
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+xyz = unique (xyz, <span class="string">'rows'</span>);
+centroid = sum (xyz)/8;
+max_dist = pdist ([xyz(8,:); xyz(1,:)])/2;
+<span class="comment">%Check each point of the sphere for intersection.</span>
+count = 1;
+   [x y] = size(Sphere(1).x);
+   inter = zeros (length(Sphere),x,y);
+<span class="keyword">for</span> (k = 1: length (Sphere))
+ <span class="keyword">for</span> (i = 1:tess+1)
+    <span class="keyword">for</span> (j = 1:tess+1)
+        <span class="keyword">if</span> (inhull([Sphere(k).x(i,j),Sphere(k).y(i,j), Sphere(k).z(i,j)], xyz))
+            points = [Sphere(k).x(i,j) Sphere(k).y(i,j) Sphere(k).z(i,j); centroid];
+            dist = pdist (points, <span class="string">'euclidean'</span>);
+            <span class="comment">%if (dist &gt;= 1)</span>
+               count = count + 1; <span class="comment">%max_dist - dist;</span>
+               <span class="comment">%count = count + 1;</span>
+            <span class="comment">%end</span>
+<span class="comment">%             count = count + 1;</span>
+            inter(k,i,j) = 1;
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">%We are returning how much is not in view so we can minimize this.</span>
+percentage = 100 - ((count/(length(Sphere)*(tess+1)*(tess+1)) * 100))
+<span class="comment">%percentage = 1/count</span>
+
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">Undefined variable nearRectangle.
+
+Error in PercentageSphereInView (line 20)
+      xyz(k, :) = [ nearRectangle.x(i,j) nearRectangle.y(i,j) nearRectangle.z(i,j)];
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function [ percentage , inter] = PercentageSphereInView (nearRectangle, farRectangle, Sphere, tess  )
+%depth of field will be 8 point giving the coordinates of the
+%depth of field vertices of the two rectangles (near and far rectangle).  
+%This is the edge of the viewing fulcstrum, as given by the draw_pyramid
+%command.  Just send the matricies from drawing two pyramids.
+%rect = struct ('x',handles.px, 'y', handles.py, 'z', handles.pz)
+% Sphere are the coordinates of the sphere of influence as given by the
+% sphere command.  
+%sphere = struct ('x',handles.px, 'y', handles.py, 'z', handles.pz)
+% tess is the tesselation used in the sphere command.  ie. 10 means that
+% you will have an 3 x 11 x 11 matrix.
+%UNTITLED Summary of this function goes here
+%   Detailed explanation goes here
+
+%extract the coordinates of the convex hull at the end of the pyramid. 
+xyz = zeros(16, 3);
+k = 1;
+for i=2:3
+    for j = 1:4
+      xyz(k, :) = [ nearRectangle.x(i,j) nearRectangle.y(i,j) nearRectangle.z(i,j)];
+      k = k+1;
+    end
+    for j = 1:4
+      xyz(k, :) = [ farRectangle.x(i,j) farRectangle.y(i,j) farRectangle.z(i,j)];
+      k = k + 1;
+    end
+end
+xyz = unique (xyz, 'rows');
+centroid = sum (xyz)/8;
+max_dist = pdist ([xyz(8,:); xyz(1,:)])/2;
+%Check each point of the sphere for intersection.
+count = 1;
+   [x y] = size(Sphere(1).x);
+   inter = zeros (length(Sphere),x,y);
+for (k = 1: length (Sphere))
+ for (i = 1:tess+1)
+    for (j = 1:tess+1) 
+        if (inhull([Sphere(k).x(i,j),Sphere(k).y(i,j), Sphere(k).z(i,j)], xyz))
+            points = [Sphere(k).x(i,j) Sphere(k).y(i,j) Sphere(k).z(i,j); centroid];
+            dist = pdist (points, 'euclidean');
+            %if (dist >= 1)
+               count = count + 1; %max_dist - dist;
+               %count = count + 1;
+            %end
+%             count = count + 1;
+            inter(k,i,j) = 1;
+        end
+    end
+end
+%We are returning how much is not in view so we can minimize this.
+percentage = 100 - ((count/(length(Sphere)*(tess+1)*(tess+1)) * 100))
+%percentage = 1/count
+
+end
+
+
+##### SOURCE END #####
+--></body></html>
